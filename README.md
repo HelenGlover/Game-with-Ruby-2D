@@ -3,7 +3,7 @@ Interactive Game designed with Ruby2d
 
 *Designed for CSC151: Programming Language Concepts (Spring 2022)*
 
-![Pic of game](https://github.com/[hglover]/[Get-the-Treasure]/blob/[branch]/design.jpg?raw=true)
+![Pic of game](https://github.com/[hglover]/[Get-the-Treasure]/blob/[main]/design.jpg?raw=true)
 
 ### Purpose of the game 
 *Get the Treasure game* Move the bluebird avatar (Bob?) to get as many gold coins as possible in under 2 minutes. 
