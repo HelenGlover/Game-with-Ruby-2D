@@ -1,0 +1,150 @@
+require 'ruby2d'
+
+# SETUP -------------------------------------------------------------------------------------------------------------------------------------
+tick = 0
+SPEED = 0.5 # control bird speed 
+set width: 640 # width of window
+set height: 480 #height of window
+collect = 0 # records how many coins were collected 
+amount = 0 # amount of times that the coin flashes 
+
+
+# COVER PAGE ------------------------------------------------------------------------------------------------------------------------------
+set title: 'Get the Treasure!'
+
+first_background = Image.new('goldencoins.png')
+message = Text.new('Welcome to the game, Get the treasure!', x: 60, y: 325, color: 'white', size: 25) 
+message1 = Text.new('Get as many coins as you can with your flap bird!', x: 60, y: 380, color: 'white', size: 20)
+message2 = Text.new('Click to begin', x: 270, y: 420, color: 'white')
+game_started = false # set game_start method
+
+# # PART A: BASICS ------------------------------------------------------------------------------------------------------------------------
+
+bird = Sprite.new( # sprite animation for flapping wings 
+  'abluebird.png',
+  x: 50,
+  y: 380,
+  height: 90,
+  width: 130,
+  clip_width: 927, # 6489 /amount of frames (7) is 92
+  rotate: -10)
+bird.remove  #remove to prevent overlap with cover page
+coin = Sprite.new( # sprite animation for coin 
+  'thecoin.png',
+  x: 50,
+  y: 380, 
+  height: 90,
+  width: 130,
+  clip_width: 84,
+  time: 300, #300 milliseconds 
+  loop: true, #loop after completing each frame 
+)
+coin.play
+coin.remove #remove to prevent overlap
+coin_collected = false 
+
+
+landscape = Image.new('landscape.png') # set image for the background 
+landscape.remove
+score = Text.new('Score: 0 out of 0', x: 235, y: 80, size: 20, color: 'black') #score display
+score.remove # remove to prevent overlap
+
+on :mouse_down do |event|
+  unless game_started
+    game_started = true #if game is starting, run all code 
+    Text.new(
+      'Get the Treasure!',
+      x: 150,
+      y: 20,
+      z: 1,
+      width: 40,
+      height: 15,
+      size: 42,
+      color: 'black',
+    )
+    landscape.add #now, add evrything that was removed
+    coin.add
+    bird.add
+    score.add
+  end
+end
+
+# PART B: BIRD CODE --------------------------------------------------------------------------------------------------------------------
+on :key_held do |event|
+  case event.key
+  when 'up' # when bird is up, move on y
+    bird.y -= 5
+    bird.play
+  when 'down' # when bird is down, move on y
+    bird.y += 5
+    bird.play
+  when 'left' # when bird is moving left, flip and don't let it go outside of window
+    bird.x -= 5
+    bird.play flip: :horizontal
+    
+    if bird.x > 0
+      bird.x -= SPEED
+    else
+      if landscape.x < 0
+        landscape.x += SPEED
+      end
+    end
+  when 'right' # when bird is moving right, don't let it go outside of window width
+    bird.x += 5
+    bird.play
+    
+    if bird.x < (Window.width - bird.width)
+      bird.x += SPEED 
+    else
+      if (landscape.x - Window.width) > -landscape.width
+        landscape.x -= SPEED 
+      end
+    end
+  end
+
+  if bird.x > coin.x - 10 && bird.x < coin.x + 10 && bird.y > coin.y - 10 && bird.y < coin.y + 10 # allows for interaction with bird and coin coordinates
+    unless coin_collected
+      collect += 1 #add coin collected to the score
+      coin.remove  #remove coin after hit
+      coin_collected = true 
+      puts collect
+    end
+  end
+
+
+# PART 3: SCORES AND COINS ---------------------------------------------------------------------------------------------------------------
+
+multi_coins = [ #various locations for the coins 
+  { x: 175, y: 188 },
+  { x: 190, y: 321 },
+  { x: 230, y: 108 },
+  { x: 565, y: 256 },
+  { x: 302, y: 256 },
+  { x: 319, y: 316 },
+  { x: 245, y: 408 },
+  { x: 150, y: 564 },
+  { x: 550, y: 408 },
+  { x: 367, y: 438 },
+  { x: 300, y: 461 },
+  { x: 492, y: 345 },
+]
+
+update do
+  if tick % 300 == 0  # Make coin appear randomly in 1- 12 locations every 5 secs
+    random_coins = multi_coins.sample #choose random coin and set coordinates 
+    coin.x = random_coins[:x]
+    coin.y = random_coins[:y] 
+    coin.add
+    coin_collected = false #starts off as false, turns to true when hit 
+  end
+
+  if tick % 300 == 180 #disappear after 3 seconds 
+    coin.remove
+    amount += 1 #update how many coin flashes
+    score.text = "Score: #{collect} out of #{amount}"
+  end  
+  tick += 1
+end
+end
+
+show
