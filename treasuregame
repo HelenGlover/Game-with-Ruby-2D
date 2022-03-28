@@ -7,6 +7,9 @@ set width: 640 # width of window
 set height: 480 #height of window
 collect = 0 # records how many coins were collected 
 amount = 0 # amount of times that the coin flashes 
+song = Music.new('Soaring.mp3')
+song.loop = true # Loop the music to repeat after finished playing
+song.play
 
 
 # COVER PAGE ------------------------------------------------------------------------------------------------------------------------------
